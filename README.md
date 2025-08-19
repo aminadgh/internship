@@ -1,62 +1,181 @@
-# internship
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+### README — SwiftNotify (Tataouine SMS Alert Platform)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel + Vue (Inertia) platform to send targeted SMS alerts to the Tataouine population via Twilio, with smart group suggestions, cost tracking, dark mode UI, and role-based access.
 
-## About Laravel
+### Features
+- Smart Group Management: auto-suggest groups, combinations, relevance scoring
+- Message Intelligence: smart templates, auto-complete, context awareness
+- SMS: bulk/group/zone/all sending, progress, history, status
+- SMS Cost Tracking: per-recipient cost, totals, analytics
+- Contacts & Groups: CSV import, map areas (Leaflet), tags/categories
+- RBAC: Admin and Agent roles
+- OAuth: Google Sign-In (desktop), Email verification
+- UI/UX: Responsive, modern dark mode, dashboards
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Tech Stack
+- Backend: Laravel 10+/PHP 8.2+
+- Frontend: Vue 3 + Inertia.js, Tailwind CSS
+- SMS: Twilio API
+- Maps: Leaflet + Leaflet.draw
+- DB: MySQL
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Prerequisites
+- PHP 8.2+, Composer
+- Node.js 18+, npm
+- MySQL 8+
+- OpenSSL (for HTTPS if using tunnels)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Quick Start
+1) Clone and install
+```bash
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+```
 
-## Learning Laravel
+2) Create database and configure `.env`
+- DB_DATABASE, DB_USERNAME, DB_PASSWORD
+- APP_URL=http://127.0.0.1:3000
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3) Migrate and seed
+```bash
+php artisan migrate
+php artisan db:seed --class=ContactGroupSeeder
+php artisan db:seed --class=MessageTemplateSeeder
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+4) Configure Twilio in `.env`
+```env
+TWILIO_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_PHONE_NUMBER=+1xxxxxxxxxx
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+5) Configure mail (Gmail App Password recommended)
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your@gmail.com
+MAIL_PASSWORD=YOUR_16_CHAR_APP_PASSWORD
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=your@gmail.com
+MAIL_FROM_NAME="SwiftNotify"
+```
 
-## Laravel Sponsors
+### Google OAuth (Desktop-only by default)
+Google blocks private IPs (192.168.x.x) for Web OAuth. Use localhost for desktop; for phones, use an HTTPS tunnel (see below).
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- Google Cloud Console → Credentials → OAuth client:
+  - Authorized JavaScript origin: http://127.0.0.1:3000
+  - Authorized redirect URI: http://127.0.0.1:3000/auth/google/callback
+- .env:
+```env
+APP_URL=http://127.0.0.1:3000
+GOOGLE_CLIENT_ID=xxxxxxxx.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=xxxxxxxxxxxx
+GOOGLE_REDIRECT_URI=http://127.0.0.1:3000/auth/google/callback
+SANCTUM_STATEFUL_DOMAINS=127.0.0.1:3000
+SESSION_DOMAIN=127.0.0.1
+SESSION_SECURE_COOKIE=false
+```
 
-### Premium Partners
+### Dev Servers
+- Laravel (serve on 127.0.0.1:3000 to match Google OAuth)
+```bash
+php artisan serve --host=127.0.0.1 --port=3000
+```
+- Vite (configured to 127.0.0.1:5174)
+```bash
+npm run dev
+```
+- Open: http://127.0.0.1:3000
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Phone (LAN) Access
+- Open the app from your phone: http://YOUR_LAN_IP:3000
+- Start Laravel: php artisan serve --host=0.0.0.0 --port=3000
+- Adjust Vite HMR to your LAN IP if needed (vite.config.js):
+  - server.hmr.host='YOUR_LAN_IP', server.port=5173, transformAssetUrls.base to that host:port
+- Note: Google OAuth won’t work on LAN IP. Use email/password login or a public HTTPS tunnel.
 
-## Contributing
+### Public HTTPS Tunnel (phone + Google OAuth)
+Use ngrok or Cloudflare Tunnel:
+- Get https://YOUR-SUBDOMAIN.ngrok-free.app
+- In Google Console:
+  - Origin: https://YOUR-SUBDOMAIN.ngrok-free.app
+  - Redirect: https://YOUR-SUBDOMAIN.ngrok-free.app/auth/google/callback
+- Update `.env` APP_URL/GOOGLE_REDIRECT_URI accordingly
+- Set SESSION_SECURE_COOKIE=true
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Important Routes
+- Messages
+  - GET /messages (compose)
+  - POST /messages (send)
+  - GET /messages/history (history)
+  - POST /messages/smart-suggestions (smart suggestions)
+- Costs
+  - GET /messages/cost-analytics
+- Admin
+  - Users management (via dashboard)
 
-## Code of Conduct
+### Seeding Demo Data
+```bash
+php artisan db:seed --class=ContactGroupSeeder
+php artisan db:seed --class=MessageTemplateSeeder
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Common Tasks
+- Clear caches
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan optimize:clear
+```
+- Fix Vite port busy
+```bash
+taskkill /IM node.exe /F
+npm run dev
+```
+- Test mail quickly
+```bash
+php artisan tinker
+>>> Mail::raw('Test', fn($m) => $m->to('you@example.com')->subject('Test'));
+```
+- Test Twilio config
+```bash
+GET /messages/test-twilio
+```
 
-## Security Vulnerabilities
+### Troubleshooting
+- Google OAuth “redirect_uri_mismatch”:
+  - Ensure the browser origin and Google Console redirect match exactly.
+  - For desktop: use 127.0.0.1:3000 only. For phone: use HTTPS tunnel.
+- CORS/HMR issues:
+  - Keep a single consistent origin (127.0.0.1:3000 for desktop).
+  - Vite configured to 127.0.0.1:5174; don’t mix with LAN IP.
+- Email “535-5.7.8 Username and Password not accepted”:
+  - Use a Gmail App Password (with 2FA enabled), not your normal password.
+  - Consider MAIL_MAILER=log or Mailtrap in development.
+- “Cannot read properties of null (method)” in pagination:
+  - Fixed; if you still see it, hard refresh to clear stale assets.
+- SMS “No contacts found”:
+  - Ensure the selected group actually contains contacts.
+  - Re-select group after refresh; confirm POST body has group_ids.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Notes
+- Email verification links are generated from APP_URL; verify that APP_URL matches the origin where you click the link. Use the same PC/browser session.
+- Notifications read state is persisted locally and survives navigation.
 
-## License
+### Build for Production (basic)
+- Set production `.env` with your domain + SSL
+- Build assets:
+```bash
+npm run build
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### License
+For academic/internship use. Adapt as needed for production.
