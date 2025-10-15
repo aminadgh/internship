@@ -1,0 +1,27 @@
+sequenceDiagram
+  autonumber
+  actor Agent as Agent (Web)
+  participant UI as Vue/Inertia UI
+  participant API as Laravel API
+  participant Twilio as Twilio SMS
+  participant DB as MySQL
+
+  Agent->>UI: Compose message (content, target)
+  UI->>API: POST /messages (content, target)
+  API->>DB: Create Message
+  API->>DB: Resolve recipients (groups/zone/all)
+  loop For each recipient
+    API->>Twilio: Send SMS
+    Twilio-->>API: SID + queued status
+    API->>DB: Create MessageRecipient (status=sent)
+  end
+  API-->>UI: 201 Created + progress summary
+
+  Note over Twilio,API: Webhook callbacks for delivery updates
+  Twilio-->>API: POST /webhooks/twilio (status update)
+  API->>DB: Update MessageRecipient (delivered/failed)
+  API->>DB: Recalculate message totals (cost, recipients)
+  API-->>UI: Realtime/next fetch reflects updated stats
+
+
+

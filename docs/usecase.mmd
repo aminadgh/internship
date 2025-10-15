@@ -1,0 +1,39 @@
+%% Mermaid use case diagram
+flowchart TB
+  subgraph Actors
+    A["Agent"]
+    Admin["Admin"]
+  end
+
+  subgraph System["SwiftNotify System"]
+    UC1(Compose SMS Message)
+    UC2(Select Target Recipients)
+    UC3(Send SMS via Twilio)
+    UC4(View Delivery Status & History)
+    UC5(Manage Contacts & Groups)
+    UC6(Manage Message Templates)
+    UC7(View Cost Analytics)
+    UC8(Authenticate & Verify Email)
+    UC9(Manage Users & Roles)
+  end
+
+  A --> UC1
+  A --> UC2
+  A --> UC3
+  A --> UC4
+  A --> UC6
+  A --> UC8
+
+  Admin --> UC5
+  Admin --> UC6
+  Admin --> UC7
+  Admin --> UC8
+  Admin --> UC9
+
+  %% Includes/extends
+  UC3 --> UC4
+  UC1 --> UC2
+  UC2 --> UC5
+
+
+

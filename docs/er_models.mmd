@@ -1,0 +1,95 @@
+classDiagram
+class User {
+  id
+  name
+  email
+  phone_number
+  company
+  google_id
+  email_verified_at
+}
+
+class Contact {
+  id
+  full_name
+  phone_number
+  group_id
+  user_id
+}
+
+class ContactGroup {
+  id
+  name
+  area_name
+  user_id
+  description
+  category
+  tags[]
+  is_active
+  geometry
+}
+
+class Message {
+  id
+  content
+  is_emergency
+  priority
+  broadcast_type
+  emergency_category
+  sent_at
+  scheduled_at
+  requires_approval
+  approved_by
+  approved_at
+  user_id
+  total_cost
+  total_recipients
+  cost_currency
+}
+
+class MessageRecipient {
+  id
+  message_id
+  contact_id
+  status
+  error_message
+  twilio_sid
+  twilio_status
+  cost
+  cost_currency
+  carrier
+  country_code
+  delivered_at
+  read_at
+  attempts
+  last_attempt_at
+}
+
+class MessageTemplate {
+  id
+  name
+  content
+  category
+  keywords[]
+  suggested_groups[]
+  is_active
+  usage_count
+  user_id
+}
+
+
+
+User "1" -- "many" Contact : hasMany
+User "1" -- "many" Message : hasMany
+ContactGroup "1" -- "many" Contact : hasMany
+Message "1" -- "many" MessageRecipient : hasMany
+Contact "1" -- "many" MessageRecipient : hasMany
+Contact "many" -- "1" ContactGroup : belongsTo
+Contact "many" -- "1" User : belongsTo (creator)
+Message "many" -- "1" User : belongsTo (sender)
+Message "many" -- "1" User : belongsTo (approver)
+MessageRecipient "many" -- "1" Message : belongsTo
+MessageRecipient "many" -- "1" Contact : belongsTo
+MessageTemplate "many" -- "1" User : belongsTo
+
+

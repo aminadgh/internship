@@ -32,6 +32,7 @@
         "@heroicons/vue": "^2.2.0",
         "@inertiajs/progress": "^0.2.7",
         "chart.js": "^4.5.0",
+        "docx": "^9.5.1",
         "install": "^0.13.0",
         "leaflet": "^1.9.4",
         "leaflet-draw": "^1.0.4",
